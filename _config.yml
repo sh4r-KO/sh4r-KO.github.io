@@ -1,3 +1,49 @@
+# _config.yml
 title: "Python Finance Portfolio"
-description: "Quant finance projects, data analysis, and risk modeling."
-theme: jekyll-theme-cayman   # or whatever theme you use
+email: your.email@example.com
+description: >
+  A showcase of my quantitative finance, risk modeling, and Python data analysis projects.
+baseurl: "" # leave empty unless you use a subpath
+url: "https://<your-username>.github.io" # change to your GitHub Pages URL or custom domain
+
+author:
+  name: "Your Name"
+  email: your.email@example.com
+  github: your-username
+  linkedin: your-linkedin
+  twitter: your-handle
+
+# Build settings
+markdown: kramdown
+remote_theme: hydecorp/hydejack
+plugins:
+  - jekyll-feed
+  - jekyll-seo-tag
+
+# Navigation (sidebar / menu)
+menu:
+  - title: "Home"
+    url: /
+  - title: "Projects"
+    url: /projects/
+  - title: "Blog"
+    url: /blog/
+  - title: "About"
+    url: /about/
+
+# Hydejack theme options
+hydejack:
+  dark_mode: true
+  accent_color: "#0074D9" # Finance-blue accent
+  copyright: "© 2025 Your Name"
+  date_format: "%B %d, %Y"
+
+# Collections for projects
+collections:
+  projects:
+    output: true
+    permalink: /projects/:name/
+
+defaults:
+  - scope:
+      path: ""
