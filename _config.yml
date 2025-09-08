@@ -7,7 +7,7 @@ baseurl: "" # leave empty unless you use a subpath
 url: "https://sh4r-KO.github.io" # change to your GitHub Pages URL or custom domain
 
 author:
-  name: "Your Name"
+  name: "Aguirre Cabrol"
   email: your.email@example.com
   github: your-username
   linkedin: your-linkedin
@@ -35,7 +35,7 @@ menu:
 hydejack:
   dark_mode: true
   accent_color: "#0074D9" # Finance-blue accent
-  copyright: "© 2025 Your Name"
+  copyright: "© 2025 Aguirre Cabrol"
   date_format: "%B %d, %Y"
 
 # Collections for projects
