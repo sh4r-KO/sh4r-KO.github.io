@@ -143,39 +143,44 @@ def populate_currency_selects():
     el('cc-quote').value = 'EUR'
 
 async def convert_fx(event=None):
-    amt_raw = el('cc-amount').value
-    base = el('cc-base').value
-    quote = el('cc-quote').value
+    clog('[py] convert_fx called')
+    res_el = el('cc-result')
+    meta_el = el('cc-meta')
+
+    base = get_value('cc-base')
+    quote = get_value('cc-quote')
+    amt_raw = get_value('cc-amt')
+
     try:
         amt = float(amt_raw)
-        if amt <= 0: raise ValueError
-    except Exception:
-        write('cc-result', "<span class='warn'>Enter a positive amount.</span>")
-        write('cc-meta', "")
-        return
-
-    if base == quote:
-        write('cc-result', f"{amt:g} {base} = {amt:g} {quote} (same currency)")
-        write('cc-meta', "")
-        return
-
-    write('cc-result', "Fetching live rate…")
-    try:
-        url = f"https://api.exchangerate.host/convert?from={base}&to={quote}&amount={amt}"
-        r = await pyfetch(url)
-        if not r.ok:
-            raise RuntimeError(f"HTTP {r.status}")
-        data = await r.json()
-        rate = (data.get("info") or {}).get("rate")
-        out = data.get("result")
-        if not (isinstance(out,(int,float)) and isinstance(rate,(int,float))):
-            raise RuntimeError("Rate unavailable")
-        write('cc-result', f"{amt:g} {base} → <strong>{out:,.2f} {quote}</strong> "
-                           f"<span class='muted'>(rate {rate:.4f})</span>")
-        write('cc-meta', f"Base: {base} · Quote: {quote} · Source: exchangerate.host · Date: {data.get('date','—')}")
+        if amt <= 0:
+            raise ValueError
+        clog('[py] inputs', {'amt': amt, 'base': base, 'quote': quote})
     except Exception as e:
-        write('cc-result', f"<span class='err'>Failed to fetch rate: {e}</span>")
-        write('cc-meta', "")
+        clog('[py] invalid amount', amt_raw, e)
+        res_el.write('<span class="warn">Enter a positive amount.</span>')
+        meta_el.write('')
+        return
+
+    res_el.write('Fetching live rate…')
+    try:
+        # Frankfurter API (no key needed)
+        url = f"https://api.frankfurter.app/latest?amount={amt}&from={base}&to={quote}"
+        clog('[py] fetch', url)
+        r = await fetch(url)
+        data = await r.json()
+        clog('[py] raw data', data.to_py())
+        rates = data.to_py().get("rates", {})
+        out = rates.get(quote)
+        if not isinstance(out, (int,float)):
+            raise RuntimeError('Rate unavailable')
+        res_el.write(f"<b>{amt:,.2f} {base}</b> ≈ <b>{out:,.2f} {quote}</b>")
+        meta_el.write(f"Date: {data.to_py().get('date')} • Source: frankfurter.app")
+    except Exception as e:
+        clog('[py] error', repr(e))
+        res_el.write(f"<span class='err'>Failed to fetch rate: {e}</span>")
+        meta_el.write('')
+
 
 def swap_fx(event=None):
     b = el('cc-base')
