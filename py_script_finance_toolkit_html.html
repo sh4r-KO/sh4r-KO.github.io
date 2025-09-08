@@ -3,45 +3,42 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>Finance Toolkit · PyScript</title>
-  <script type="module" src="https://pyscript.net/latest/pyscript.js"></script>
+  <title>Finance Toolkit · Pyodide (No PyScript CDN)</title>
+  <script src="https://cdn.jsdelivr.net/pyodide/v0.24.1/full/pyodide.js"></script>
   <style>
-    :root {
-      --bg: #0f172a; --card: #0b1220; --muted: #94a3b8; --text: #e5e7eb; --accent: #60a5fa; --ok:#34d399; --warn:#f59e0b; --err:#ef4444;
-    }
-    * { box-sizing: border-box; }
-    body { margin:0; background: radial-gradient(1200px 800px at 80% -10%, #1f2937 0%, var(--bg) 60%); color: var(--text); font-family: ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial; }
-    header { padding: 40px 20px 10px; text-align:center; }
-    h1 { margin:0; font-size: clamp(28px, 5vw, 40px); }
-    p.lead { margin: 8px 0 0; color: var(--muted); }
-    .wrap { max-width: 1100px; margin: 24px auto 80px; padding: 0 16px; }
+    :root { --bg:#0f172a; --card:#0b1220; --muted:#94a3b8; --text:#e5e7eb; --accent:#60a5fa; --ok:#34d399; --warn:#f59e0b; --err:#ef4444; }
+    body { margin:0; background: radial-gradient(1200px 800px at 80% -10%, #1f2937 0%, var(--bg) 60%); color:var(--text); font-family: ui-sans-serif,system-ui,-apple-system,Segoe UI,Roboto,Helvetica,Arial; }
+    header { padding:40px 20px 10px; text-align:center; }
+    h1 { margin:0; font-size: clamp(28px,5vw,40px); }
+    p.lead { margin:8px 0 0; color:var(--muted); }
+    .wrap { max-width:1100px; margin:24px auto 80px; padding:0 16px; }
     .grid { display:grid; gap:20px; grid-template-columns: repeat(auto-fit, minmax(320px, 1fr)); }
-    .card { background: linear-gradient(180deg, rgba(255,255,255,.04), rgba(255,255,255,.02)); border:1px solid rgba(255,255,255,.08); border-radius:16px; padding:18px; box-shadow: 0 10px 25px rgba(0,0,0,.25); backdrop-filter: blur(6px); }
+    .card { background: linear-gradient(180deg, rgba(255,255,255,.04), rgba(255,255,255,.02)); border:1px solid rgba(255,255,255,.08); border-radius:16px; padding:18px; box-shadow:0 10px 25px rgba(0,0,0,.25); backdrop-filter: blur(6px); }
     .card h2 { margin:4px 0 14px; font-size:20px; }
     label { font-size:13px; color:var(--muted); display:block; margin-bottom:6px; }
-    input, select { width:100%; padding:10px 12px; border-radius:12px; border:1px solid rgba(255,255,255,.15); background: var(--card); color:var(--text); }
-    input:focus, select:focus { outline:none; border-color: var(--accent); box-shadow: 0 0 0 3px rgba(96,165,250,.2); }
+    input, select { width:100%; padding:10px 12px; border-radius:12px; border:1px solid rgba(255,255,255,.15); background:var(--card); color:var(--text); }
+    input:focus, select:focus { outline:none; border-color:var(--accent); box-shadow:0 0 0 3px rgba(96,165,250,.2); }
     .row { display:grid; gap:12px; grid-template-columns: 1fr 1fr; }
-    .btn { display:inline-flex; align-items:center; gap:8px; cursor:pointer; border:1px solid rgba(255,255,255,.15); background: var(--card); color:var(--text); padding:10px 14px; border-radius:12px; font-weight:600; }
+    .btn { display:inline-flex; align-items:center; gap:8px; cursor:pointer; border:1px solid rgba(255,255,255,.15); background:var(--card); color:var(--text); padding:10px 14px; border-radius:12px; font-weight:600; }
     .btn.primary { background: linear-gradient(90deg, #2563eb, #06b6d4); border:none; }
-    .result { margin-top:12px; padding:12px; border-radius:12px; background: var(--card); border:1px solid rgba(255,255,255,.08); }
+    .result { margin-top:12px; padding:12px; border-radius:12px; background:var(--card); border:1px solid rgba(255,255,255,.08); min-height: 24px; }
     .muted { color:var(--muted); font-size:12px; }
     .ok { color:var(--ok); }
     .warn { color:var(--warn); }
     .err { color:var(--err); }
     footer { text-align:center; color:var(--muted); padding:32px 16px; }
-    code.inline { background: var(--card); padding:2px 6px; border-radius:8px; border:1px solid rgba(255,255,255,.08); }
+    code.inline { background:var(--card); padding:2px 6px; border-radius:8px; border:1px solid rgba(255,255,255,.08); }
   </style>
 </head>
 <body>
   <header>
-    <h1>Finance Toolkit (PyScript)</h1>
-    <p class="lead">Interactive widgets powered by Python running in your browser</p>
+    <h1>Finance Toolkit (Pyodide)</h1>
+    <p class="lead">Runs Python in the browser without PyScript CDN</p>
   </header>
 
   <main class="wrap">
     <section class="grid">
-      <!-- Currency Converter (PyScript) -->
+      <!-- Currency Converter -->
       <div class="card" aria-labelledby="cc-heading">
         <h2 id="cc-heading">Currency Converter (Live Rates)</h2>
         <div class="row">
@@ -60,15 +57,15 @@
             <select id="cc-quote"></select>
           </div>
           <div style="display:flex; align-items:flex-end; gap:8px;">
-            <button class="btn" id="cc-swap" >⇅ Swap</button>
-            <button class="btn primary" id="cc-convert" >Convert</button>
+            <button class="btn" id="cc-swap">⇅ Swap</button>
+            <button class="btn primary" id="cc-convert">Convert</button>
           </div>
         </div>
         <div class="result" id="cc-result" aria-live="polite"></div>
         <p class="muted" id="cc-meta"></p>
       </div>
 
-      <!-- Compound Interest (PyScript) -->
+      <!-- Compound Interest -->
       <div class="card" aria-labelledby="ci-heading">
         <h2 id="ci-heading">Compound Interest Calculator</h2>
         <div class="row">
@@ -100,8 +97,8 @@
           </div>
         </div>
         <div style="margin-top:12px; display:flex; gap:8px;">
-          <button class="btn primary" >Calculate</button>
-          <button class="btn" >Clear</button>
+          <button class="btn primary" id="ci-calc">Calculate</button>
+          <button class="btn" id="ci-clear">Clear</button>
         </div>
         <div class="result" id="ci-result" aria-live="polite"></div>
         <p class="muted">Formula: <code class="inline">A = P · (1 + r/n)^(n·t)</code></p>
@@ -110,57 +107,45 @@
   </main>
 
   <footer>
-    <small>Runs 100% client‑side with PyScript (Pyodide). No server required.</small>
+    <small>No server required · FX via exchangerate.host</small>
   </footer>
 
-  <!-- PyScript logic -->
-  <script type="py">
-from pyscript import document, Element, js
+  <script>
+    const pythonCode = `
+from js import document
 from pyodide.http import pyfetch
-from pyodide.ffi import create_proxy
-import math, asyncio
 
-# ---------- Helpers ----------
 CURRENCIES = ['USD','EUR','GBP','JPY','AUD','CAD','CHF','CNY','INR','NZD','SEK','NOK','SGD','HKD']
 
 def el(id):
-    return Element(id)
+    return document.getElementById(id)
 
-def get_value(id):
-    return el(id).element.value
-
-# ---------- Currency Converter ----------
+def write(id, html):
+    el(id).innerHTML = html
 
 def populate_currency_selects():
-    options = ''.join([f'<option value="{c}">{c}</option>' for c in CURRENCIES])
-    el('cc-base').element.innerHTML = options
-    el('cc-quote').element.innerHTML = options
-    el('cc-base').element.value = 'USD'
-    el('cc-quote').element.value = 'EUR'
+    opts = ''.join([f"<option value='{c}'>{c}</option>" for c in CURRENCIES])
+    el('cc-base').innerHTML = opts
+    el('cc-quote').innerHTML = opts
+    el('cc-base').value = 'USD'
+    el('cc-quote').value = 'EUR'
 
-async def convert_fx(event=None):
-    amt_raw = get_value('cc-amount')
-    base = get_value('cc-base')
-    quote = get_value('cc-quote')
-
-    res_el = el('cc-result')
-    meta_el = el('cc-meta')
-
+async def convert_fx():
+    amt_raw = el('cc-amount').value
+    base = el('cc-base').value
+    quote = el('cc-quote').value
     try:
         amt = float(amt_raw)
-        if amt <= 0:
-            raise ValueError
+        if amt <= 0: raise ValueError
     except Exception:
-        res_el.write('<span class="warn">Enter a positive amount.</span>')
-        meta_el.write('')
+        write('cc-result', "<span class='warn'>Enter a positive amount.</span>")
+        write('cc-meta', '')
         return
-
     if base == quote:
-        res_el.write(f'{amt:g} {base} = {amt:g} {quote} (same currency)')
-        meta_el.write('')
+        write('cc-result', f"{amt:g} {base} = {amt:g} {quote} (same currency)")
+        write('cc-meta', '')
         return
-
-    res_el.write('Fetching live rate…')
+    write('cc-result', 'Fetching live rate…')
     try:
         url = f"https://api.exchangerate.host/convert?from={base}&to={quote}&amount={amt}"
         r = await pyfetch(url)
@@ -169,71 +154,76 @@ async def convert_fx(event=None):
         data = await r.json()
         rate = (data.get('info') or {}).get('rate')
         out = data.get('result')
-        if not (isinstance(out, (int,float)) and isinstance(rate, (int,float))):
+        if not (isinstance(out,(int,float)) and isinstance(rate,(int,float))):
             raise RuntimeError('Rate unavailable')
-        res_el.write(f"{amt:g} {base} → <strong>{out:,.2f} {quote}</strong> <span class='muted'>(rate {rate:.4f})</span>")
-        meta_el.write(f"Base: {base} · Quote: {quote} · Source: exchangerate.host · Date: {data.get('date','—')}")
+        write('cc-result', f"{amt:g} {base} → <strong>{out:,.2f} {quote}</strong> <span class='muted'>(rate {rate:.4f})</span>")
+        write('cc-meta', f"Base: {base} · Quote: {quote} · Source: exchangerate.host · Date: {data.get('date','—')}")
     except Exception as e:
-        # Note: CORS/network issues will show here
-        res_el.write(f"<span class='err'>Failed to fetch rate: {e}</span>")
-        meta_el.write('')
+        write('cc-result', f"<span class='err'>Failed to fetch rate: {e}</span>")
+        write('cc-meta', '')
 
+# Compound interest
 
-def swap_fx(event=None):
-    b = el('cc-base').element.value
-    q = el('cc-quote').element.value
-    el('cc-base').element.value, el('cc-quote').element.value = q, b
-    asyncio.create_task(convert_fx())
-
-# ---------- Compound Interest ----------
-
-def calc_ci(event=None):
-    res = el('ci-result')
-    try:
-        p = float(get_value('ci-principal'))
-        rpct = float(get_value('ci-rate'))
-        years = float(get_value('ci-years'))
-        times = int(get_value('ci-n'))
-        if p <= 0 or rpct < 0 or years < 0 or times <= 0:
-            raise ValueError
-    except Exception:
-        res.write('<span class="warn">Enter valid positive numbers (rate/years can be zero).</span>')
+def calc_ci():
+    from math import pow
+    p = float(el('ci-principal').value or 0)
+    r_pct = float(el('ci-rate').value or 0)
+    years = float(el('ci-years').value or 0)
+    n = int(el('ci-n').value or 1)
+    if p <= 0 or r_pct < 0 or years < 0 or n <= 0:
+        write('ci-result', "<span class='warn'>Enter valid positive numbers (rate/years can be zero).</span>")
         return
-
-    r = rpct / 100.0
-    A = p * (1 + r / times) ** (times * years)
-    simpleA = p * (1 + r * years)
+    r = r_pct/100.0
+    A = p * pow(1 + r/n, n*years)
+    simpleA = p * (1 + r*years)
     interest = A - p
     simpleInterest = simpleA - p
-
-    res.write(
+    write('ci-result',
         f"<div><strong>Future Value:</strong> ${A:,.2f}</div>"
         f"<div>Interest Earned: <span class='ok'>${interest:,.2f}</span></div>"
         "<hr style='border-color: rgba(255,255,255,.08)'>"
         f"<div class='muted'>Simple interest (no compounding): ${simpleA:,.2f} · Interest: ${simpleInterest:,.2f}</div>"
-        f"<div class='muted'>Inputs — P: ${p:,.2f}, r: {rpct}% APR, n: {times}/yr, t: {years} yrs</div>"
+        f"<div class='muted'>Inputs — P: ${p:,.2f}, r: {r_pct}% APR, n: {n}/yr, t: {years} yrs</div>"
     )
 
 
-def clear_ci(event=None):
-    el('ci-principal').element.value = '1000'
-    el('ci-rate').element.value = '5'
-    el('ci-years').element.value = '10'
-    el('ci-n').element.value = '12'
-    el('ci-result').write('')
+def clear_ci():
+    el('ci-principal').value = '1000'
+    el('ci-rate').value = '5'
+    el('ci-years').value = '10'
+    el('ci-n').value = '12'
+    write('ci-result', '')
+`;
 
-# --- Wire up events ---
-populate_currency_selects()
+    let pyodideInstance;
 
-# Use create_proxy to bind JS events to Python coroutines
-js.document.getElementById('cc-convert').addEventListener('click', create_proxy(lambda e: asyncio.create_task(convert_fx())))
-js.document.getElementById('cc-swap').addEventListener('click', create_proxy(swap_fx))
-js.document.getElementById('ci-calc').addEventListener('click', create_proxy(calc_ci))
-js.document.getElementById('ci-clear').addEventListener('click', create_proxy(clear_ci))
+    async function init() {
+      pyodideInstance = await loadPyodide({ indexURL: 'https://cdn.jsdelivr.net/pyodide/v0.24.1/full/' });
+      await pyodideInstance.runPythonAsync(pythonCode);
+      // Expose Python functions
+      const populate = pyodideInstance.globals.get('populate_currency_selects');
+      const convert = pyodideInstance.globals.get('convert_fx');
+      const calc = pyodideInstance.globals.get('calc_ci');
+      const clear = pyodideInstance.globals.get('clear_ci');
 
-# Optional: do an initial calculation
-asyncio.create_task(convert_fx())
-calc_ci()
-</script>
+      // Wire events
+      document.getElementById('cc-convert').addEventListener('click', () => convert());
+      document.getElementById('cc-swap').addEventListener('click', () => {
+        const b = document.getElementById('cc-base');
+        const q = document.getElementById('cc-quote');
+        [b.value, q.value] = [q.value, b.value];
+        convert();
+      });
+      document.getElementById('ci-calc').addEventListener('click', () => calc());
+      document.getElementById('ci-clear').addEventListener('click', () => clear());
+
+      // Initial state
+      populate();
+      convert();
+      calc();
+    }
+
+    window.addEventListener('load', init);
+  </script>
 </body>
 </html>
