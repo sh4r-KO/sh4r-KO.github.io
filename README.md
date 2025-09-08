@@ -24,7 +24,7 @@ and compares them against benchmarks like the **S&P 500**.
 - Visualize cumulative growth over time
 
 ### 📊 Results
-![Portfolio vs SP500](results/portfolio_vs_sp500.png)
+![Portfolio vs SP500](results/sp500_daily.png)
 
 Here’s a sample plot of my portfolio compared to the S&P 500 index.
 
