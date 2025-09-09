@@ -1,8 +1,14 @@
 ---
 layout:          projects
-title:           Projects*
+title:           compound_interest
 show_collection: caca
 featured:        true
 ---
-A showcase of my quantitative finance, risk modeling, and Python data analysis projects.
+layout:          projects
+title:           compound_interest
+show_collection: caca
+featured:        true
+---
+
+
 

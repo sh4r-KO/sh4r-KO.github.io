@@ -41,6 +41,10 @@ collections:
   projects:
     output: true
     permalink: /projects/:name/
+    permalink: /projects/:compound_interest.md/
+    permalink: /projects/:compound_interest.md
+    permalink: /projects/compound_interest.md/
+    permalink: /projects/compound_interest.md
 
 defaults:
   - scope:
