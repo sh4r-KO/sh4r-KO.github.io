@@ -63,97 +63,102 @@ def _embed_plot(fig):
     document.getElementById("plot").innerHTML = img_html
 
 async def convert(event=None):
-    amt, base, quote, days = _read_inputs()
-    out = document.getElementById("fx-out")
-    meta = document.getElementById("fx-meta")
-    if any(v is None for v in (amt, base, quote, days)):
-        out.innerHTML = '<span class="warn">Enter a positive amount and a lookback of at least 2 days.</span>'
-        meta.textContent = ""
-        document.getElementById("plot").innerHTML = ""
-        return
-    if base == quote:
-        out.innerHTML = '<span class="warn">Base and quote currencies must differ.</span>'
-        meta.textContent = ""
-        document.getElementById("plot").innerHTML = ""
-        return
-
-    # compute dates
-    end = date.today()
-    start = end - timedelta(days=days)
-    start_s = start.isoformat()
-    end_s = end.isoformat()
-
+    loading = document.getElementById("loading")
+    loading.style.display = "block"
     try:
-        xs, rates = await _fetch_timeseries(base, quote, start_s, end_s)
-    except Exception as e:
-        out.innerHTML = f'<span class="err">Failed to fetch rates: {e}</span>'
-        meta.textContent = ""
-        document.getElementById("plot").innerHTML = ""
-        return
+        amt, base, quote, days = _read_inputs()
+        out = document.getElementById("fx-out")
+        meta = document.getElementById("fx-meta")
+        if any(v is None for v in (amt, base, quote, days)):
+            out.innerHTML = '<span class="warn">Enter a positive amount and a lookback of at least 2 days.</span>'
+            meta.textContent = ""
+            document.getElementById("plot").innerHTML = ""
+            return
+        if base == quote:
+            out.innerHTML = '<span class="warn">Base and quote currencies must differ.</span>'
+            meta.textContent = ""
+            document.getElementById("plot").innerHTML = ""
+            return
 
-    # Value series (amount converted each day)
-    values = [amt * r for r in rates]
-    baseline_rate = rates[0]
-    baseline_value = amt * baseline_rate
+        # compute dates
+        end = date.today()
+        start = end - timedelta(days=days)
+        start_s = start.isoformat()
+        end_s = end.isoformat()
 
-    # Build component series:
-    # - baseline series: constant (baseline_value) for fill reference
-    # - delta series: value - baseline_value (can be positive or negative)
-    deltas = [v - baseline_value for v in values]
+        try:
+            xs, rates = await _fetch_timeseries(base, quote, start_s, end_s)
+        except Exception as e:
+            out.innerHTML = f'<span class="err">Failed to fetch rates: {e}</span>'
+            meta.textContent = ""
+            document.getElementById("plot").innerHTML = ""
+            return
 
-    # Summary for last day
-    final_value = values[-1]
-    change_abs = final_value - baseline_value
-    change_pct = (change_abs / baseline_value) * 100 if baseline_value != 0 else 0
+        # Value series (amount converted each day)
+        values = [amt * r for r in rates]
+        baseline_rate = rates[0]
+        baseline_value = amt * baseline_rate
 
-    color = "#34d399" if change_abs >= 0 else "#ef4444"
+        # Build component series:
+        # - baseline series: constant (baseline_value) for fill reference
+        # - delta series: value - baseline_value (can be positive or negative)
+        deltas = [v - baseline_value for v in values]
 
-    out.innerHTML = (
-        f"<b>{amt:,.2f} {base}</b> was worth "
-        f"<b>{values[-1]:,.2f} {quote}</b> on {xs[-1]}<br>"
-        f"Baseline (first day {xs[0]} @ {baseline_rate:.6f}): "
-        f"<b>{baseline_value:,.2f} {quote}</b><br>"
-        f'Change vs baseline: '
-        f'<b style=\"color:{color}\">{change_abs:,.2f} {quote} ({change_pct:+.2f}%)</b>'
-    )
-    meta.textContent = f"Source: frankfurter.app • Window: {xs[0]} → {xs[-1]} • Points: {len(xs)}"
+        # Summary for last day
+        final_value = values[-1]
+        change_abs = final_value - baseline_value
+        change_pct = (change_abs / baseline_value) * 100 if baseline_value != 0 else 0
 
-    # ---- Plot: filled baseline + gains/losses (green above, red below) ----
-    X = list(range(len(xs)))
-    y_baseline = [baseline_value] * len(values)
-    y_actual = values
+        color = "#34d399" if change_abs >= 0 else "#ef4444"
 
-    fig = plt.figure(figsize=(7.2, 4.2))
-    ax = fig.gca()
+        out.innerHTML = (
+            f"<b>{amt:,.2f} {base}</b> was worth "
+            f"<b>{values[-1]:,.2f} {quote}</b> on {xs[-1]}<br>"
+            f"Baseline (first day {xs[0]} @ {baseline_rate:.6f}): "
+            f"<b>{baseline_value:,.2f} {quote}</b><br>"
+            f'Change vs baseline: '
+            f'<b style=\"color:{color}\">{change_abs:,.2f} {quote} ({change_pct:+.2f}%)</b>'
+        )
+        meta.textContent = f"Source: frankfurter.app • Window: {xs[0]} → {xs[-1]} • Points: {len(xs)}"
 
-    # Fill baseline area (principal-equivalent) lightly
-    ax.fill_between(X, 0, y_baseline, alpha=0.25, color="#60a5fa", label="Baseline value")
+        # ---- Plot: filled baseline + gains/losses (green above, red below) ----
+        X = list(range(len(xs)))
+        y_baseline = [baseline_value] * len(values)
+        y_actual = values
 
-    # Positive deltas
-    pos = [max(0.0, d) for d in deltas]
-    if any(p > 0 for p in pos):
-        ax.fill_between(X, y_baseline, [b+p for b, p in zip(y_baseline, pos)],
-                        where=[p>0 for p in pos], alpha=0.6, color="#34d399", label="Gain vs baseline")
+        fig = plt.figure(figsize=(7.2, 4.2))
+        ax = fig.gca()
 
-    # Negative deltas
-    neg = [min(0.0, d) for d in deltas]
-    if any(n < 0 for n in neg):
-        ax.fill_between(X, y_baseline, [b+n for b, n in zip(y_baseline, neg)],
-                        where=[n<0 for n in neg], alpha=0.5, color="#ef4444", label="Loss vs baseline")
+        # Fill baseline area (principal-equivalent) lightly
+        ax.fill_between(X, 0, y_baseline, alpha=0.25, color="#60a5fa", label="Baseline value")
 
-    ax.plot(X, y_actual, linewidth=1.5)  # outline of actual value
-    ax.set_title(f"{amt:,.0f} {base} in {quote} over time")
-    ax.set_ylabel(f"Value in {quote}")
-    ax.set_xlabel("Date")
+        # Positive deltas
+        pos = [max(0.0, d) for d in deltas]
+        if any(p > 0 for p in pos):
+            ax.fill_between(X, y_baseline, [b+p for b, p in zip(y_baseline, pos)],
+                            where=[p>0 for p in pos], alpha=0.6, color="#34d399", label="Gain vs baseline")
 
-    step = max(1, len(xs)//6)
-    xticks = list(range(0, len(xs), step))
-    ax.set_xticks(xticks)
-    ax.set_xticklabels([xs[i] for i in xticks], rotation=30, ha="right")
-    ax.legend(loc="upper left")
-    ax.grid(True, alpha=0.3)
+        # Negative deltas
+        neg = [min(0.0, d) for d in deltas]
+        if any(n < 0 for n in neg):
+            ax.fill_between(X, y_baseline, [b+n for b, n in zip(y_baseline, neg)],
+                            where=[n<0 for n in neg], alpha=0.5, color="#ef4444", label="Loss vs baseline")
 
-    _embed_plot(fig)
+        ax.plot(X, y_actual, linewidth=1.5)  # outline of actual value
+        ax.set_title(f"{amt:,.0f} {base} in {quote} over time")
+        ax.set_ylabel(f"Value in {quote}")
+        ax.set_xlabel("Date")
+
+        step = max(1, len(xs)//6)
+        xticks = list(range(0, len(xs), step))
+        ax.set_xticks(xticks)
+        ax.set_xticklabels([xs[i] for i in xticks], rotation=30, ha="right")
+        ax.legend(loc="upper left")
+        ax.grid(True, alpha=0.3)
+
+        _embed_plot(fig)
+    finally:
+        loading.style.display = "none"
 
 # Initialize selects on load
 _fill_currency_selects()
