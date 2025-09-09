@@ -5,6 +5,7 @@ description: >
   A showcase of my quantitative finance, risk modeling, and Python data analysis projects.
 baseurl: "" # leave empty unless you use a subpath
 url: "https://sh4r-KO.github.io" # change to your GitHub Pages URL or custom domain
+url: "https://sh4r-KO.github.io/compound_interest.html"
 
 author:
   name: "Aguirre Cabrol"
