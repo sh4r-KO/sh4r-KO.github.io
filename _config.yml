@@ -45,6 +45,8 @@ collections:
     permalink: /projects/:compound_interest.md
     permalink: /projects/compound_interest.md/
     permalink: /projects/compound_interest.md
+    permalink: /projects/:compound_interest
+    permalink: /projects/compound_interest
 
 defaults:
   - scope:
