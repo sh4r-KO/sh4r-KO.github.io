@@ -1,0 +1,117 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <title>Compound Interest with Contributions (PyScript 2025.8.1)</title>
+
+  <link rel="stylesheet" href="https://pyscript.net/releases/2025.8.1/core.css">
+  <script type="module" src="https://pyscript.net/releases/2025.8.1/core.js"></script>
+    <link rel="stylesheet" href="assets/css/style.css">
+
+</head>
+<body>
+  <h1>Compound Interest Calculator (Pyodide)</h1>
+
+  <div class="card">
+    <label for="principal">Principal</label>
+    <input id="principal" type="number" value="1000" />
+
+    <label for="rate">Annual Interest Rate (%)</label>
+    <input id="rate" type="number" value="5" />
+
+    <label for="years">Years</label>
+    <input id="years" type="number" value="10" />
+
+    <label for="n">Compounds per Year</label>
+    <input id="n" type="number" value="12" />
+
+    <label for="contrib">Recurring Contribution per Period</label>
+    <input id="contrib" type="number" value="100" />
+
+    <button class="primary" py-click="calc">Calculate</button>
+    <div class="result" id="output"></div>
+    <div id="plot"></div>
+  </div>
+
+  <py-config>
+    packages = ["matplotlib"]
+  </py-config>
+
+  <py-script>
+import matplotlib.pyplot as plt
+import io, base64
+from js import document
+
+def calc(event=None):
+    try:
+        P = float(document.getElementById("principal").value)
+        r_pct = float(document.getElementById("rate").value)
+        t = float(document.getElementById("years").value)
+        n = int(document.getElementById("n").value)
+        contrib = float(document.getElementById("contrib").value)
+        if P < 0 or r_pct < 0 or t < 0 or n <= 0 or contrib < 0:
+            raise ValueError("Inputs must be valid positive numbers")
+    except Exception as e:
+        document.getElementById("output").innerHTML = f"<span style=""color:orange"">Invalid input: {e}</span>"
+        return
+
+    r = r_pct / 100.0
+    periods = int(n*t)
+
+    balances = []
+    invested_principal = []
+    contributed = []
+    interest_values = []
+    times = []
+
+    balance = P
+    total_contrib = 0
+    total_interest = 0
+
+    for k in range(periods+1):
+        times.append(k/n)
+        balances.append(balance)
+        invested_principal.append(P)
+        contributed.append(total_contrib)
+        interest_values.append(balance - P - total_contrib)
+
+        # grow balance one period
+        balance = balance * (1 + r/n)
+        balance += contrib
+        total_contrib += contrib
+
+    final = balances[-1]
+    total_interest = final - P - total_contrib
+
+    document.getElementById("output").innerHTML = f"""
+    Future Value: <b>{final:,.2f}</b><br>
+    Principal Invested: <b>{P:,.2f}</b><br>
+    Contributions: <b>{total_contrib:,.2f}</b><br>
+    Compound Interest: <b>{total_interest:,.2f}</b>
+    """
+
+    # Plot stacked fill
+    plt.figure(figsize=(6.5,4))
+    plt.stackplot(
+        times, invested_principal, contributed, interest_values,
+        labels=["Initial Principal","Contributions","Interest Earned"],
+        colors=["#60a5fa","#fbbf24","#34d399"], alpha=0.85
+    )
+    plt.xlabel("Years")
+    plt.ylabel("Value")
+    plt.title("Growth of Investment with Contributions")
+    plt.legend(loc="upper left")
+    plt.grid(True, alpha=0.3)
+
+    buf = io.BytesIO()
+    plt.savefig(buf, format="png", bbox_inches="tight")
+    plt.close()
+    data = base64.b64encode(buf.getvalue()).decode("utf-8")
+    buf.close()
+
+    img_html = f'<img src="data:image/png;base64,{data}" style="max-width:100%; border-radius:8px;"/>'
+    document.getElementById("plot").innerHTML = img_html
+  </py-script>
+</body>
+</html>
