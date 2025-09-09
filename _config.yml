@@ -26,7 +26,7 @@ menu:
   - title: "Home"
     url: /
   - title: "Projects"
-    url: /compound_interest.html
+    url:   /projects/
 
 
 # Hydejack theme options
